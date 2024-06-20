@@ -8,13 +8,33 @@ import (
 )
 
 func repl() {
-	type cliCommand struct {
-		name        string
-		description string
-		callback    func() error
-	}
+	scanner := bufio.NewScanner(os.Stdin)
+	fmt.Print("PokeDex > ")
 
-	commands := map[string]cliCommand{
+	for scanner.Scan() {
+		text := strings.ToLower(scanner.Text())
+		command, exists := getCommands()[text]
+		if exists {
+			err := command.callback()
+			if err != nil {
+				fmt.Println(err)
+			}
+		} else {
+			fmt.Println("Unknown command")
+		}
+
+		fmt.Print("\nPokeDex > ")
+	}
+}
+
+type cliCommand struct {
+	name        string
+	description string
+	callback    func() error
+}
+
+func getCommands() map[string]cliCommand {
+	return map[string]cliCommand{
 		"help": {
 			name:        "help",
 			description: "Display help message",
@@ -25,23 +45,15 @@ func repl() {
 			description: "Exit PokeDex",
 			callback:    commandExit,
 		},
-	}
-
-	scanner := bufio.NewScanner(os.Stdin)
-	fmt.Print("PokeDex > ")
-
-	for scanner.Scan() {
-		text := strings.ToLower(scanner.Text())
-		if text == "help" {
-			commands[text].callback()
-			fmt.Printf("help: %v\n", commands[text].description)
-			fmt.Printf("exit: %v\n\n", commands["exit"].description)
-		} else if text == "exit" {
-			commands[text].callback()
-		} else {
-			fmt.Printf("Unknown command\n\n")
-		}
-
-		fmt.Print("PokeDex > ")
+		"map": {
+			name:        "map",
+			description: "Display 20 locations",
+			callback:    getMap,
+		},
+		"mapb": {
+			name:        "mapb",
+			description: "Display previous 20 locations",
+			callback:    getMapB,
+		},
 	}
 }
