@@ -15,11 +15,20 @@ func repl(cfg *config) {
 
 	for scanner.Scan() {
 		text := strings.ToLower(scanner.Text())
-		command, exists := getCommands()[text]
+		words := strings.Split(text, " ")
+		command, exists := getCommands()[words[0]]
 		if exists {
-			err := command.callback(cfg)
-			if err != nil {
-				fmt.Println(err)
+			if command.callbackarg != nil {
+				err := command.callbackarg(cfg, words[1])
+				if err != nil {
+					fmt.Printf("Error executing callbackarg")
+				}
+			}
+			if command.callback != nil {
+				err := command.callback(cfg)
+				if err != nil {
+					fmt.Println(err)
+				}
 			}
 		} else {
 			fmt.Println("Unknown command")
@@ -33,6 +42,7 @@ type cliCommand struct {
 	name        string
 	description string
 	callback    func(*config) error
+	callbackarg func(*config, string) error
 }
 
 type config struct {
@@ -46,21 +56,31 @@ func getCommands() map[string]cliCommand {
 			name:        "help",
 			description: "Display help message",
 			callback:    commandHelp,
+			callbackarg: nil,
 		},
 		"exit": {
 			name:        "exit",
 			description: "Exit PokeDex",
 			callback:    commandExit,
+			callbackarg: nil,
 		},
 		"map": {
 			name:        "map",
 			description: "Display 20 locations",
 			callback:    getMap,
+			callbackarg: nil,
 		},
 		"mapb": {
 			name:        "mapb",
 			description: "Display previous 20 locations",
 			callback:    getMapB,
+			callbackarg: nil,
+		},
+		"explore": {
+			name:        "explore",
+			description: "Explore <location_name> for Pokemon",
+			callback:    nil,
+			callbackarg: explore,
 		},
 	}
 }
