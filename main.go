@@ -9,8 +9,9 @@ import (
 func main() {
 	clearInterval := 5 * time.Minute
 	cfg := &config{
-		cache: pokecache.NewCache(clearInterval),
-		page:  -1,
+		cache:   pokecache.NewCache(clearInterval),
+		page:    -1,
+		pokemon: make(map[string]pokemon),
 	}
 	repl(cfg)
 }

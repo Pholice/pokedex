@@ -46,8 +46,9 @@ type cliCommand struct {
 }
 
 type config struct {
-	cache pokecache.Cache
-	page  int
+	cache   pokecache.Cache
+	page    int
+	pokemon map[string]pokemon
 }
 
 func getCommands() map[string]cliCommand {
@@ -78,9 +79,15 @@ func getCommands() map[string]cliCommand {
 		},
 		"explore": {
 			name:        "explore",
-			description: "Explore <location_name> for Pokemon",
+			description: "explore <location_name> - Explores location for Pokemon",
 			callback:    nil,
 			callbackarg: explore,
+		},
+		"catch": {
+			name:        "catch",
+			description: "catch <pokemon_name> - Attempts to catch Pokemon",
+			callback:    nil,
+			callbackarg: catch,
 		},
 	}
 }
