@@ -18,38 +18,44 @@ type page struct {
 	} `json:"results"`
 }
 
-func getPageAPI() string {
-	if pageIndex == 0 {
+func getPageAPI(cfg *config) string {
+	if cfg.page == 0 {
 		return "https://pokeapi.co/api/v2/location-area/"
 	}
-	url := fmt.Sprintf("https://pokeapi.co/api/v2/location-area/?offset=%v&limit=20", pageIndex*20)
+	url := fmt.Sprintf("https://pokeapi.co/api/v2/location-area/?offset=%v&limit=20", cfg.page*20)
 	return url
 }
 
-func getPage() (page, error) {
+func getPage(cfg *config) (page, error) {
 	var p page
-	resp, err := http.Get(getPageAPI())
-	if err != nil {
-		fmt.Println("Could not retrieve data from API")
+	cached, ok := cfg.cache.Get(getPageAPI(cfg))
+	if !ok {
+		resp, err := http.Get(getPageAPI(cfg))
+		if err != nil {
+			fmt.Println("Could not retrieve data from API")
+		}
+
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			fmt.Println("Could not read response body")
+		}
+		cfg.cache.Add(getPageAPI(cfg), body)
+		defer resp.Body.Close()
+
+		err = json.Unmarshal(body, &p)
+		if err != nil {
+			fmt.Println("Could not unmarshal response body")
+		}
 	}
 
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		fmt.Println("Could not read response body")
-	}
-
-	defer resp.Body.Close()
-	err = json.Unmarshal(body, &p)
-	if err != nil {
-		fmt.Println("Could not unmarshal response body")
-	}
+	json.Unmarshal(cached, &p)
 
 	return p, nil
 }
 
-func getMap() error {
-	pageIndex += 1
-	p, err := getPage()
+func getMap(cfg *config) error {
+	cfg.page += 1
+	p, err := getPage(cfg)
 	if err != nil {
 		fmt.Printf("Couldn't get page")
 	}
@@ -60,12 +66,12 @@ func getMap() error {
 	return nil
 }
 
-func getMapB() error {
-	if pageIndex == 0 {
+func getMapB(cfg *config) error {
+	if cfg.page == 0 {
 		return errors.New("nothing behind the first page")
 	}
-	pageIndex--
-	p, err := getPage()
+	cfg.page--
+	p, err := getPage(cfg)
 	if err != nil {
 		fmt.Printf("Couldn't get page")
 	}

@@ -15,9 +15,10 @@ type Cache struct {
 	mu    *sync.Mutex
 }
 
-func NewCachce(interval time.Duration) Cache {
+func NewCache(interval time.Duration) Cache {
 	c := Cache{
 		cache: make(map[string]cacheEntry),
+		mu:    &sync.Mutex{},
 	}
 	go c.reapLoop(interval)
 	return c
@@ -44,11 +45,11 @@ func (c *Cache) Get(key string) ([]byte, bool) {
 }
 
 func (c *Cache) reapLoop(interval time.Duration) {
-	c.mu.Lock()
-	defer c.mu.Unlock()
 	ticker := time.NewTicker(interval)
 	for range ticker.C {
+		c.mu.Lock()
 		c.reap(interval)
+		c.mu.Unlock()
 	}
 }
 

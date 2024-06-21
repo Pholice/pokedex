@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/Pholice/pokedex/internal/pokecache"
 )
 
-func repl() {
+func repl(cfg *config) {
 	scanner := bufio.NewScanner(os.Stdin)
 	fmt.Print("PokeDex > ")
 
@@ -15,7 +17,7 @@ func repl() {
 		text := strings.ToLower(scanner.Text())
 		command, exists := getCommands()[text]
 		if exists {
-			err := command.callback()
+			err := command.callback(cfg)
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -30,7 +32,12 @@ func repl() {
 type cliCommand struct {
 	name        string
 	description string
-	callback    func() error
+	callback    func(*config) error
+}
+
+type config struct {
+	cache pokecache.Cache
+	page  int
 }
 
 func getCommands() map[string]cliCommand {

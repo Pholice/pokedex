@@ -1,7 +1,16 @@
 package main
 
-var pageIndex int = -1
+import (
+	"time"
+
+	"github.com/Pholice/pokedex/internal/pokecache"
+)
 
 func main() {
-	repl()
+	clearInterval := 5 * time.Minute
+	cfg := &config{
+		cache: pokecache.NewCache(clearInterval),
+		page:  -1,
+	}
+	repl(cfg)
 }
