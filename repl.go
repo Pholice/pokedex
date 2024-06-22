@@ -55,25 +55,25 @@ func getCommands() map[string]cliCommand {
 	return map[string]cliCommand{
 		"help": {
 			name:        "help",
-			description: "Display help message",
+			description: "help - Display help message",
 			callback:    commandHelp,
 			callbackarg: nil,
 		},
 		"exit": {
 			name:        "exit",
-			description: "Exit PokeDex",
+			description: "exit - Exit PokeDex",
 			callback:    commandExit,
 			callbackarg: nil,
 		},
 		"map": {
 			name:        "map",
-			description: "Display 20 locations",
+			description: "map - Display 20 locations",
 			callback:    getMap,
 			callbackarg: nil,
 		},
 		"mapb": {
 			name:        "mapb",
-			description: "Display previous 20 locations",
+			description: "mapb - Display previous 20 locations",
 			callback:    getMapB,
 			callbackarg: nil,
 		},
@@ -94,6 +94,12 @@ func getCommands() map[string]cliCommand {
 			description: "inspect <pokemon_name> - Inspects your pokemon (must be caught)",
 			callback:    nil,
 			callbackarg: inspect,
+		},
+		"pokedex": {
+			name:        "pokedex",
+			description: "pokedex - Lists pokemons caught",
+			callback:    pokedex,
+			callbackarg: nil,
 		},
 	}
 }

@@ -281,7 +281,7 @@ func catch(cfg *config, name string) error {
 	cfg.cache.Add(api, body)
 	json.Unmarshal(body, &p)
 
-	chance := rand.Intn(635) + 35
+	chance := rand.Intn(650) - p.BaseExperience
 	fmt.Printf("Base Experience: %d\nThrowing a pokeball at %s...\nRolled: %d\n", p.BaseExperience, name, chance)
 	if chance >= p.BaseExperience {
 		cfg.pokemon[name] = p
