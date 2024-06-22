@@ -286,6 +286,8 @@ func catch(cfg *config, name string) error {
 	if chance >= p.BaseExperience {
 		cfg.pokemon[name] = p
 		fmt.Printf("%s was caught!", name)
+	} else {
+		fmt.Printf("%s got away!", name)
 	}
 	return nil
 }
