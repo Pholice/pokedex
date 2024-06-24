@@ -4,49 +4,20 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
-	"net/http"
 )
-
-type locationPage struct {
-	Count    int    `json:"count"`
-	Next     string `json:"next"`
-	Previous any    `json:"previous"`
-	Results  []struct {
-		Name string `json:"name"`
-		URL  string `json:"url"`
-	} `json:"results"`
-}
-
-func getPageAPI(cfg *config) string {
-	if cfg.page == 0 {
-		return "https://pokeapi.co/api/v2/location-area/"
-	}
-	url := fmt.Sprintf("https://pokeapi.co/api/v2/location-area/?offset=%v&limit=20", cfg.page*20)
-	return url
-}
 
 func getPage(cfg *config) (locationPage, error) {
 	var p locationPage
-	cached, ok := cfg.cache.Get(getPageAPI(cfg))
+	api := ""
+	if cfg.page == 0 {
+		api = "https://pokeapi.co/api/v2/location-area/"
+	} else {
+		api = fmt.Sprintf("https://pokeapi.co/api/v2/location-area/?offset=%v&limit=20", cfg.page*20)
+	}
+
+	cached, ok := cfg.cache.Get(api)
 	if !ok {
-		resp, err := http.Get(getPageAPI(cfg))
-		if err != nil {
-			fmt.Println("Could not retrieve data from API")
-		}
-
-		body, err := io.ReadAll(resp.Body)
-		if err != nil {
-			fmt.Println("Could not read response body")
-		}
-		cfg.cache.Add(getPageAPI(cfg), body)
-		defer resp.Body.Close()
-
-		err = json.Unmarshal(body, &p)
-		if err != nil {
-			fmt.Println("Could not unmarshal response body")
-		}
-
+		cached = http_page(cfg, api)
 	}
 	json.Unmarshal(cached, &p)
 	return p, nil

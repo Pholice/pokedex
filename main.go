@@ -11,7 +11,7 @@ func main() {
 	cfg := &config{
 		cache:   pokecache.NewCache(clearInterval),
 		page:    -1,
-		pokemon: make(map[string]pokemon),
+		pokemon: make(map[string]pokemonPage),
 	}
 	repl(cfg)
 }

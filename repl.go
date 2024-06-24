@@ -48,7 +48,7 @@ type cliCommand struct {
 type config struct {
 	cache   pokecache.Cache
 	page    int
-	pokemon map[string]pokemon
+	pokemon map[string]pokemonPage
 }
 
 func getCommands() map[string]cliCommand {
